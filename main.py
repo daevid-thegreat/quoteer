@@ -6,18 +6,23 @@ import os
 from flask import Flask
 from os import environ
 from dotenv import load_dotenv
-
+load_dotenv()
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET")
 CONSUMER_KEY = os.getenv("CONSUMER_KEY")
 CONSUMER_SECRET = os.getenv("CONSUMER_SECRET")
 RapidAPI_Key = os.getenv("X-RapidAPI-Key")
-load_dotenv()
+
+
+def get_key():
+    return RapidAPI_Key
+
+
 url1 = "https://quotes15.p.rapidapi.com/quotes/random/"
 
 headers = {
-    "X-RapidAPI-Key": RapidAPI_Key,
+    "X-RapidAPI-Key":  '' + get_key(),
     "X-RapidAPI-Host": "quotes15.p.rapidapi.com"
 }
 
@@ -28,6 +33,8 @@ z = "\n   ⁓ "
 
 # convert json to dictionary
 x_dict = json.loads(x)
+print(x)
+print(x_dict)
 y = x_dict["content"] + z + x_dict["originator"]["name"]
 
 # authenticate tweeter

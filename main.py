@@ -33,8 +33,6 @@ z = "\n   ⁓ "
 
 # convert json to dictionary
 x_dict = json.loads(x)
-print(x)
-print(x_dict)
 y = x_dict["content"] + z + x_dict["originator"]["name"]
 
 # authenticate tweeter
@@ -48,8 +46,12 @@ interval = 60 * 60
 
 
 def create_tweet():
+    # print(y)
     api.update_status(y)
     time.sleep(interval)
+
+
+create_tweet()
 
 
 app = Flask(__name__)

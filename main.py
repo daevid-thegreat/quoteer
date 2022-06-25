@@ -3,9 +3,8 @@ import time
 import requests
 import tweepy
 import os
-from flask import Flask
-from os import environ
 from dotenv import load_dotenv
+
 load_dotenv()
 
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
@@ -22,20 +21,25 @@ def get_key():
 url1 = "https://quotes15.p.rapidapi.com/quotes/random/"
 
 headers = {
-    "X-RapidAPI-Key":  '' + get_key(),
+    "X-RapidAPI-Key": '' + get_key(),
     "X-RapidAPI-Host": "quotes15.p.rapidapi.com"
 }
 
+
 # get API response
-response = requests.request("GET", url1, headers=headers)
-x = response.text
-z = "\n   ⁓ "
+def get_quotes():
+    response = requests.request("GET", url1, headers=headers)
+    x = response.text
+    z = "\n   ⁓ "
 
-# convert json to dictionary
-x_dict = json.loads(x)
-y = x_dict["content"] + z + x_dict["originator"]["name"]
+    # convert json to dictionary
+    x_dict = json.loads(x)["content"] + z + json.loads(x)["originator"]["name"]
+    y = x_dict
 
-# authenticate tweeter
+    return y
+
+
+# authenticate twitter
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
@@ -46,13 +50,16 @@ interval = 60 * 60
 
 
 def create_tweet():
-    # print(y)
-    api.update_status(y)
-    time.sleep(interval)
+    if len(get_quotes()) >= 280:
+        print("Quotes more than 280 characters")
+        time.sleep(60)
+    while len(get_quotes()) <= 280:
+        try:
+            api.update_status(get_quotes())
+            time.sleep(interval)
+        except tweepy.TwitterServerError as e:
+            print(e.reason)
 
 
-create_tweet()
-
-
-app = Flask(__name__)
-app.run(host='https://quoteer.herokuapp.com/', port=environ.get('PORT'))
+if __name__ == '__main__':
+    create_tweet()
